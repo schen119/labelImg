@@ -149,6 +149,8 @@ class PascalVocReader:
         points = [(xmin, ymin), (xmax, ymin), (xmax, ymax), (xmin, ymax)]
         self.shapes.append((label, points, None, None, difficult))
 
+
+
     def parseXML(self):
         assert self.filepath.endswith(XML_EXT), "Unsupport file format"
         parser = etree.XMLParser(encoding=ENCODE_METHOD)
@@ -169,4 +171,12 @@ class PascalVocReader:
             if object_iter.find('difficult') is not None:
                 difficult = bool(int(object_iter.find('difficult').text))
             self.addShape(label, bndbox, difficult)
+
+            # sc edit: parse part object
+            for part_iter in object_iter.findall('part'):
+                bndbox = part_iter.find("bndbox")
+                label = part_iter.find('name').text
+                difficult = False
+                self.addShape(label, bndbox, difficult)
+ 
         return True
