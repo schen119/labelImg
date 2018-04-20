@@ -151,6 +151,7 @@ class PascalVocReader:
 
 
 
+
     def parseXML(self):
         assert self.filepath.endswith(XML_EXT), "Unsupport file format"
         parser = etree.XMLParser(encoding=ENCODE_METHOD)
@@ -162,21 +163,22 @@ class PascalVocReader:
                 self.verified = True
         except KeyError:
             self.verified = False
-
         for object_iter in xmltree.findall('object'):
             bndbox = object_iter.find("bndbox")
             label = object_iter.find('name').text
-            # Add chris
-            difficult = False
-            if object_iter.find('difficult') is not None:
-                difficult = bool(int(object_iter.find('difficult').text))
-            self.addShape(label, bndbox, difficult)
+            if bndbox is not None and label is not None:
+                # Add chris
+                difficult = False
+                if object_iter.find('difficult') is not None:
+                    difficult = bool(int(object_iter.find('difficult').text))
+                self.addShape(label, bndbox, difficult)
 
             # sc edit: parse part object
             for part_iter in object_iter.findall('part'):
                 bndbox = part_iter.find("bndbox")
                 label = part_iter.find('name').text
                 difficult = False
-                self.addShape(label, bndbox, difficult)
+                if bndbox is not None and label is not None:
+                    self.addShape(label, bndbox, difficult)
  
         return True
