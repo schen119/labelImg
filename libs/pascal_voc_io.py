@@ -136,12 +136,15 @@ class PascalVocReader:
         try:
             self.parseXML()
         except:
+            print("parseXML exception!!")
             pass
 
     def getShapes(self):
         return self.shapes
 
     def addShape(self, label, bndbox, difficult):
+        if not bndbox.find('xmin').text or not bndbox.find('ymin').text or not bndbox.find('xmax').text or not bndbox.find('ymax').text:
+            return
         xmin = int(bndbox.find('xmin').text)
         ymin = int(bndbox.find('ymin').text)
         xmax = int(bndbox.find('xmax').text)
@@ -163,6 +166,7 @@ class PascalVocReader:
                 self.verified = True
         except KeyError:
             self.verified = False
+
         for object_iter in xmltree.findall('object'):
             bndbox = object_iter.find("bndbox")
             label = object_iter.find('name').text
@@ -173,6 +177,7 @@ class PascalVocReader:
                     difficult = bool(int(object_iter.find('difficult').text))
                 self.addShape(label, bndbox, difficult)
 
+
             # sc edit: parse part object
             for part_iter in object_iter.findall('part'):
                 bndbox = part_iter.find("bndbox")
@@ -180,5 +185,5 @@ class PascalVocReader:
                 difficult = False
                 if bndbox is not None and label is not None:
                     self.addShape(label, bndbox, difficult)
- 
+        
         return True
